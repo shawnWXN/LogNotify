@@ -59,7 +59,7 @@ class _LoggerHandler:
                 'title': title,
                 'content': msg,
                 'level': level,
-                'service': "{} | {}".format(SETTING.APP_NAME or 'undefined', get_hostname()),
+                'app': "{} | {}".format(SETTING.APP_NAME or 'undefined', get_hostname()),
                 'isp': get_ip_isp(),
                 'lineno': r"{}:{}:{}".format(frame.filename.replace('\\', '\\\\'), frame.function, frame.lineno),
                 'ts': get_gmt_time(),
@@ -77,8 +77,8 @@ class _LoggerHandler:
                                                                                               self._transport.count()))
 
 
-def init(logger, notify_url: str = '', app_name: str = '', notify_userid: str = '',
-         notify_interval: typing.Optional[int] = None, notify_track_level: typing.Optional[int] = None):
+def init_notify(logger, notify_url: str = '', app_name: str = '', notify_userid: str = '',
+                notify_interval: typing.Optional[int] = None, notify_track_level: typing.Optional[int] = None):
     """
     :param logger:
     :param notify_url:

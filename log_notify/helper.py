@@ -18,7 +18,7 @@ def get_hostname() -> str:
 
 @lru_cache
 def get_ip_isp() -> typing.Optional[str]:
-    # FIXME 若是返回None，大概率是requests超时
+    # FIXME It is possible that null is returned due to a timeout
     try:
         resp = requests.get('http://ip-api.com/json', timeout=3)  # noqa
         if resp.status_code != 200:

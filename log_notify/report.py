@@ -14,9 +14,9 @@ class ReportThread:
     def __init__(self, logger, transport: Transport, worker_num: int = 1, sleep_interval: int = 2):
         """
         :param logger: LoggerHandler
-        :param transport: Transport队列
-        :param worker_num: 队列消费者数量
-        :param sleep_interval: 队空时等待时长(s)
+        :param transport: Transport
+        :param worker_num:
+        :param sleep_interval:
         """
         assert worker_num >= 1, "LogNotify ReportThread `worker_num` must >= 1"
         assert sleep_interval >= 2, "LogNotify ReportThread `sleep_interval` must >= 2"
@@ -39,7 +39,7 @@ class ReportThread:
                     continue
 
                 task = self._transport.pop(timeout=2)
-                if not isinstance(task, dict):  # 默认消费者只处理dict任务
+                if not isinstance(task, dict):  # tips, The default consumer processes only dict tasks
                     track_log(self._logger, logging.WARNING, 'LogNotify ReportThread invalid ({}){}, from {}.'
                                                              ''.format(type(task), str(task)[:1024], self._transport))
                     continue
