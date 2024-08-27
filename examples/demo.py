@@ -1,6 +1,6 @@
 import logging
 
-from log_notify.handle import init_notify
+from log_notify import init_notify
 from loguru import logger
 
 if __name__ == '__main__':
