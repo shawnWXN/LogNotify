@@ -23,7 +23,7 @@ class _ReportSender:
                        '<font color="{color}">[{level}]: {content}</font>\n' \
                        '> app: <font color="comment">{app}</font>\n' \
                        '> loc: <font color="comment">{isp}</font>\n' \
-                       '> GTM: <font color="comment">{ts}</font>\n' \
+                       '> gtm: <font color="comment">{ts}</font>\n' \
                        '> code: <font color="comment">{lineno}</font>\n' \
                        '> kwargs: <font color="comment">{kwargs}</font>\n' \
                        ''.format(

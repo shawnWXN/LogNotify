@@ -60,7 +60,6 @@ class ReportThread:
             if res:
                 track_log(self._logger, res[0], res[1])
             else:
-
                 track_log(self._logger, logging.DEBUG,
                           'LogNotify ReportThread success {}, left: {}.'.format(str(task)[:1024],
                                                                                 self._transport.count()))

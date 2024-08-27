@@ -71,4 +71,5 @@ def track_log(logger, level: int, msg: str):
     from .setting import SETTING
 
     if SETTING.NOTIFY_TRACK_LEVEL <= level:
+        print(f'enter!! {level_switch(logger, level)} {msg}')
         logger.log(level_switch(logger, level), msg)
