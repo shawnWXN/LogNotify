@@ -56,7 +56,7 @@ class ReportThread:
                 time.sleep(self.sleep_interval)
                 continue
 
-            res = sender.report(task)
+            res = sender.send(task)
             if res:
                 track_log(self._logger, res[0], res[1])
             else:
