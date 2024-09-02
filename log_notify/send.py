@@ -19,26 +19,25 @@ class _ReportSender:
 
     @staticmethod
     def _send_wework(task) -> typing.Optional[typing.Tuple[int, str]]:
-        # 实现发送到企业微信的逻辑
         try:
             font_color = {50: 'red', 40: 'red', 30: 'yellow', 20: 'black', 10: 'gray'}.get(task.get('level')) or 'gray'
-            markdown = '### 标题: {title}\n' \
+            markdown = '### Title: {title}\n' \
                        '<font color="{color}">[{level}]: {content}</font>\n' \
-                       '> 服务: <font color="comment">{service}</font>\n' \
-                       '> 位置: <font color="comment">{isp}</font>\n' \
-                       '> 时间: <font color="comment">{ts}</font>\n' \
-                       '> 源码: <font color="comment">{lineno}</font>\n' \
+                       '> app: <font color="comment">{app}</font>\n' \
+                       '> loc: <font color="comment">{isp}</font>\n' \
+                       '> gtm: <font color="comment">{ts}</font>\n' \
+                       '> code: <font color="comment">{lineno}</font>\n' \
                        '> kwargs: <font color="comment">{kwargs}</font>\n' \
                        ''.format(
-                title=task.get('title'),
-                color=font_color,
-                content=task.get('content'),
-                level=logging.getLevelName(task.get('level')),
-                service=task.get('service'),
-                isp=task.get('isp'),
-                ts=task.get('ts'),
-                lineno=task.get('lineno'),
-                kwargs=json.dumps(task.get('kwargs'), ensure_ascii=False)
+                        title=task.get('title'),
+                        color=font_color,
+                        content=task.get('content'),
+                        level=logging.getLevelName(task.get('level')),
+                        app=task.get('app'),
+                        isp=task.get('isp'),
+                        ts=task.get('ts'),
+                        lineno=task.get('lineno'),
+                        kwargs=json.dumps(task.get('kwargs'), ensure_ascii=False)
             )
             if task.get('userid'):
                 markdown += ",".join(['<@{}>'.format(u) for u in task.get('userid').split(',')])
@@ -60,7 +59,6 @@ class _ReportSender:
 
     @staticmethod
     def _send_custom(task) -> typing.Optional[typing.Tuple[int, str]]:
-        # 实现发送到自定义 URL 的逻辑
         try:
             task.update({
                 'level': logging.getLevelName(task.get('level'))
@@ -79,6 +77,11 @@ class _ReportSender:
 
     @lru_cache()
     def _send(self, task_str: str, quotient: float) -> typing.Optional[typing.Tuple[int, str]]:
+        """
+        :param task_str:
+        :param quotient: execution interval buffer
+        :return:
+        """
         task = json.loads(task_str)
         task['ts'] = self.task_ts_map.pop(task_str, None) or get_gmt_time()
 

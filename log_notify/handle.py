@@ -59,7 +59,7 @@ class _LoggerHandler:
                 'title': title,
                 'content': msg,
                 'level': level,
-                'service': "{} | {}".format(SETTING.APP_NAME or 'undefined', get_hostname()),
+                'app': "{} | {}".format(SETTING.APP_NAME or 'undefined', get_hostname()),
                 'isp': get_ip_isp(),
                 'lineno': r"{}:{}:{}".format(frame.filename.replace('\\', '\\\\'), frame.function, frame.lineno),
                 'ts': get_gmt_time(),
@@ -77,8 +77,8 @@ class _LoggerHandler:
                                                                                               self._transport.count()))
 
 
-def init(logger, notify_url: str = '', app_name: str = '', notify_userid: str = '',
-         notify_interval: typing.Optional[int] = None, notify_track_level: typing.Optional[int] = None):
+def init_notify(logger, notify_url: str = '', app_name: str = '', notify_userid: str = '',
+                notify_interval: typing.Optional[int] = None, notify_track_level: typing.Optional[int] = None):
     """
     :param logger:
     :param notify_url:
@@ -111,12 +111,12 @@ def init(logger, notify_url: str = '', app_name: str = '', notify_userid: str = 
     logger_handler = _LoggerHandler(logger, t)
 
     logger_handler.logger.exception = functools.partial(logger_handler.log, do_report=True, exc_info=True,
-                                                        level=logging.ERROR, title='Logger.Exception')
+                                                        level=logging.ERROR, title='exception log')
     logger_handler.logger.error = functools.partial(logger_handler.log, do_report=True, exc_info=False,
-                                                    level=logging.ERROR, title='Logger.Error')
+                                                    level=logging.ERROR, title='error log')
     logger_handler.logger.warning = functools.partial(logger_handler.log, exc_info=False,
-                                                      level=logging.WARNING, title='Logger.Warning')
+                                                      level=logging.WARNING, title='warn log')
     logger_handler.logger.info = functools.partial(logger_handler.log, exc_info=False,
-                                                   level=logging.INFO, title='Logger.Info')
+                                                   level=logging.INFO, title='info log')
     logger_handler.logger.debug = functools.partial(logger_handler.log, exc_info=False,
-                                                    level=logging.DEBUG, title='Logger.Debug')
+                                                    level=logging.DEBUG, title='debug log')
