@@ -4,6 +4,8 @@ import typing
 import logging
 import traceback
 import requests
+from datetime import datetime
+from decimal import Decimal
 from functools import lru_cache
 from urllib.parse import urlparse
 
@@ -85,9 +87,24 @@ class _ReportSender:
         else:
             return self._send_custom(task)
 
-    def report(self, task: dict) -> typing.Optional[typing.Tuple[int, str]]:
+    @staticmethod
+    def _converter(o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+        elif isinstance(o, set):
+            return list(o)
+        elif isinstance(o, bytes):
+            return o.decode('utf-8')
+        elif isinstance(o, Decimal):
+            return float(o)
+        elif hasattr(o, '__dict__'):
+            return o.__dict__
+        else:
+            raise TypeError(f"Type {type(o)} not serializable")
+
+    def send(self, task: dict) -> typing.Optional[typing.Tuple[int, str]]:
         ts = task.pop('ts', None)
-        task_str = json.dumps(task, ensure_ascii=False)
+        task_str = json.dumps(task, ensure_ascii=False, default=self._converter)
         self.task_ts_map[task_str] = ts
         return self._send(task_str, time.time() // SETTING.NOTIFY_INTERVAL)
 
