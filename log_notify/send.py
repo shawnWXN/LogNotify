@@ -58,6 +58,54 @@ class _ReportSender:
             return logging.ERROR, "LogNotify send wework error.\n" + traceback.format_exc()
 
     @staticmethod
+    def _send_feishu(task: dict) -> typing.Optional[typing.Tuple[int, str]]:
+        """
+        message = {
+                'title': title,
+                'content': msg,
+                'level': level,
+                'app': "{} | {}".format(SETTING.APP_NAME or 'undefined', get_hostname()),
+                'isp': get_ip_isp(),
+                'lineno': r"{}:{}:{}".format(frame.filename.replace('\\', '\\\\'), frame.function, frame.lineno),
+                'ts': get_gmt_time(),
+                'userid': userid or SETTING.NOTIFY_USERID
+            }
+            if data and isinstance(data, dict):
+                message['kwargs'] = data
+        """
+        try:
+            title = task.pop('title', 'Bot message')
+            content = task.pop('content', 'This is a dfault message.')
+            level = task.pop('level', 'INFO')
+            userid = task.pop('userid', None)
+
+            contents = [[{'tag': 'text', 'text': f'[{logging.getLevelName(level)}]: {content}\n'}]]
+            for k, v in task.items():
+                contents.append([{'tag': 'text', 'text': f'|{k}: {v if isinstance(v, str) else json.dumps(v, ensure_ascii=False)}'}])
+            if userid:
+                contents.append([{'tag': 'at', 'at': {'user_id': userid}}])
+
+            log_text = "LogNotify requests.post {}, json:{}, ".format(SETTING.NOTIFY_URL, str(task)[:1024])
+            resp: requests.Response = requests.post(url=SETTING.NOTIFY_URL, json={
+                "msg_type": "post",
+                "content": {
+                    "post": {
+                        "zh_cn": {
+                            "title": title,
+                            "content": contents
+                        }
+                    }
+                }
+            }, timeout=6)  # noqa
+
+            if resp.status_code != 200 or not resp.headers.get('Content-Type').count('application/json') \
+                    or resp.json().get('code') != 0:
+                return logging.WARNING, log_text + "Response[{}] {}".format(resp.status_code, resp.content)
+
+        except Exception:  # noqa
+            return logging.ERROR, "LogNotify send wework error.\n" + traceback.format_exc()
+
+    @staticmethod
     def _send_custom(task) -> typing.Optional[typing.Tuple[int, str]]:
         try:
             task.update({
@@ -69,8 +117,6 @@ class _ReportSender:
 
             if resp.status_code != 200:
                 return logging.WARNING, log_text + "Response[{}] {}".format(resp.status_code, resp.content)
-
-            print(resp.status_code, resp.content)
 
         except Exception:  # noqa
             return logging.ERROR, "LogNotify send custom error.\n" + traceback.format_exc()
@@ -87,6 +133,8 @@ class _ReportSender:
 
         if 'qyapi.weixin.qq.com' == urlparse(SETTING.NOTIFY_URL).netloc:
             return self._send_wework(task)
+        elif 'open.feishu.cn' == urlparse(SETTING.NOTIFY_URL).netloc:
+            return self._send_feishu(task)
         else:
             return self._send_custom(task)
 
